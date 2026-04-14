@@ -7,7 +7,7 @@ import React from "react";
 
 export default async function Page() {
   const products = await getAllProductsAction();
-  console.log("Product page : ", products);
+  // console.log("Product page : ", products);
   const categories = await getProductCategoriesAction();
   return (
     <div>

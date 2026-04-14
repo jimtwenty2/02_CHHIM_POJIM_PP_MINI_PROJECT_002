@@ -15,7 +15,6 @@ export async function createOrderService(orderData) {
   });
 
   if (!response.ok) {
-    // Get the specific error message from the backend
     const errorBody = await response.json().catch(() => ({}));
     console.error("Full Backend Error Response:", errorBody);
     

@@ -182,7 +182,6 @@ export default function ShopCardComponent({ products = [], categories = [] }) {
             <span className="font-bold text-black">
               {filteredProducts?.length} products
             </span>
-            {/* The count now compares based on the current category context */}
             <span className="ml-1 text-gray-400">
               (of {categoryMatchedProducts?.length})
             </span>
