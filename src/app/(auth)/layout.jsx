@@ -77,7 +77,6 @@ function ProductIcon({ className, variant }) {
     );
   }
 
-  // fallback: drop
   return (
     <svg
       viewBox="0 0 24 24"
@@ -134,7 +133,6 @@ export default function AuthLayout({ children }) {
             </p>
           </div>
 
-          {/* Centered form card comes from the route page */}
           <div>{children}</div>
         </div>
       </div>

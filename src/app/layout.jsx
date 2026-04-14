@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Provider from "./provider";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +19,7 @@ export const metadata = {
     "Curated skincare, makeup, and fragrance — a student demo storefront.",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
   return (
     <html
       lang="en"
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col bg-[#fafafa] text-gray-900">
         <Provider>
           {children}
+          <Toaster position="top-left" richColors />
         </Provider>
       </body>
     </html>

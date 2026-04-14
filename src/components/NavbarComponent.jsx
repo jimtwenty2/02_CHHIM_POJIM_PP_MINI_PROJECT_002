@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@heroui/react";
-// import { useCart } from "@/store/cartStore";
+import { logoutAction } from "@/action/auth.action";
+import { useCartStore } from "@/app/store/useCartStore";
 
 const centerLinks = [
   { href: "/", label: "Home" },
@@ -35,7 +36,8 @@ function CartBagIcon({ className }) {
 
 function linkActive(pathname, label) {
   if (label === "Home") return pathname === "/";
-  if (label === "Shop") return pathname === "/products" || pathname.startsWith("/products/");
+  if (label === "Shop")
+    return pathname === "/products" || pathname.startsWith("/products/");
   if (label === "Categories") return pathname === "/categories";
   if (label === "Orders") return pathname === "/orders";
   if (label === "Manage Products") return pathname === "/manage-products";
@@ -54,18 +56,29 @@ function authLinkClass(pathname, path, filled = false) {
     : "rounded-full px-4 py-2 text-sm font-medium text-gray-600 transition hover:text-gray-900 hover:ring-1 hover:ring-gray-200";
 }
 
-export default function NavbarComponent() {
+export default function NavbarComponent({ session }) {
+  const cartCount = useCartStore((state) => state.cartCount);
+
+  const isLoggedIn = !!session;
+  console.log("NavBar : Session : ", session?.user?.id);
+
+  const [profileOpen, setProfileOpen] = useState(false);
+
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-//   const { totalQuantity } = useCart();
+  //   const { totalQuantity } = useCart();
 
-//   const cartLabel =
-//     totalQuantity > 0 ? `Shopping cart, ${totalQuantity} items` : "Shopping cart";
+  //   const cartLabel =
+  //     totalQuantity > 0 ? `Shopping cart, ${totalQuantity} items` : "Shopping cart";
 
   const linkClass = (active) =>
     `relative flex items-center rounded-full px-3 py-2 text-sm font-medium transition ${
       active ? "text-slate-900" : "text-slate-600 hover:text-slate-900"
     }`;
+
+  const handleLogout = async () => {
+    await logoutAction();
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200/80 bg-white/60 backdrop-blur-md">
@@ -84,8 +97,12 @@ export default function NavbarComponent() {
           {centerLinks.map(({ href, label, badge }) => {
             const active = linkActive(pathname, label);
             return (
-              <Link key={href + label} href={href} className={linkClass(active)}>
-              {/* <Link key={href + label} href={href}> */}
+              <Link
+                key={href + label}
+                href={href}
+                className={linkClass(active)}
+              >
+                {/* <Link key={href + label} href={href}> */}
                 {badge && (
                   <span className="absolute -top-2 z-20 left-1/2 -translate-x-1/2 rounded-full bg-lime-400 px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-gray-900">
                     {badge}
@@ -100,14 +117,50 @@ export default function NavbarComponent() {
         </nav>
 
         <div className="z-10 flex items-center gap-2 sm:gap-3">
-          <div className="hidden items-center gap-2 sm:flex">
-            <Link href="/login" className={authLinkClass(pathname, "/login", false)}>
-              Log in
-            </Link>
-            <Link href="/register" className={authLinkClass(pathname, "/register", true)}>
-              Register
-            </Link>
-          </div>
+          {/* */}
+          {!isLoggedIn ? (
+            <>
+              <div className="hidden items-center gap-2 sm:flex">
+                <Link
+                  href="/login"
+                  className={authLinkClass(pathname, "/login", false)}
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/register"
+                  className={authLinkClass(pathname, "/register", true)}
+                >
+                  Register
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="relative">
+                {/* Button */}
+                <button
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className="text-l relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-700 hover:border-lime-300 hover:bg-lime-50"
+                >
+                  U
+                </button>
+
+                {/* Dropdown */}
+                {profileOpen && (
+                  <div className="absolute right-0 mt-2 w-32 rounded-lg border bg-white shadow-md">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
           <Link
             href="/cart"
             // aria-label={cartLabel}
@@ -119,14 +172,14 @@ export default function NavbarComponent() {
             }`}
           >
             <CartBagIcon className="size-5" />
-            {/* <span
-              className={`absolute -right-0.5 -top-0.5 flex min-h-4.5 min-w-4.5 items-center justify-center rounded-full bg-teal-900 px-1 text-[10px] font-semibold leading-none text-lime-300 tabular-nums transition-opacity ${
-                totalQuantity > 0 ? "opacity-100" : "pointer-events-none opacity-0"
+            <span
+              className={`absolute -right-0.5 -top-0.5 flex min-h-4.5 min-w-4.5 items-center justify-center rounded-full bg-green-400 px-1 text-[10px] font-semibold leading-none text-white tabular-nums transition-opacity ${
+                cartCount > 0 ? "opacity-100" : "pointer-events-none opacity-0"
               }`}
               aria-hidden
             >
-              {totalQuantity > 99 ? "99+" : totalQuantity}
-            </span> */}
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
           </Link>
 
           <Button
@@ -144,7 +197,10 @@ export default function NavbarComponent() {
       </div>
 
       {open && (
-        <div id="mobile-nav" className="border-t border-gray-100 bg-white py-3 md:hidden">
+        <div
+          id="mobile-nav"
+          className="border-t border-gray-100 bg-white py-3 md:hidden"
+        >
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-1">
             {centerLinks.map(({ href, label }) => (
               <Link

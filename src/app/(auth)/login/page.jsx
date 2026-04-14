@@ -3,7 +3,7 @@ import LoginFormComponent from "../_components/LoginFormComponent";
 
 export const metadata = {
   title: "Log in | PurelyStore",
-  description: "Sign in to your account (demo UI only).",
+  description: "Sign in to your account.",
 };
 
 export default function LoginPage() {
